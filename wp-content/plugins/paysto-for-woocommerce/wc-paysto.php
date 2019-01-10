@@ -24,12 +24,17 @@ function paysto_rub_currency_symbol($currency_symbol, $currency)
         $currency_symbol = 'р.';
     }
 
+    if ($currency == "USD") {
+        $currency_symbol = '$';
+    }
+
     return $currency_symbol;
 }
 
 function paysto_rub_currency($currencies)
 {
     $currencies["RUB"] = 'Russian Roubles';
+    $currencies["USD"] = 'USA Dollars';
 
     return $currencies;
 }
@@ -305,8 +310,7 @@ function woocommerce_paysto()
             $action_adr = $this->liveurl; // Url
             $orderAmount = $this->getOrderTotal($order); // Get order amount in 123.21
             $now = time();
-
-
+            
             $x_relay_url = get_site_url() . '/' . '?wc-api=wc_paysto&paysto=result';
 
             $args = array(
@@ -480,6 +484,19 @@ function woocommerce_paysto()
                     } else {
                         wp_die('Request Failure');
                     }
+                } else if (isset($_GET['paysto']) and $_GET['paysto'] == 'success') {
+                    $orderId = $_POST['x_invoice_num'];
+                    $order = new WC_Order($orderId);
+                    WC()->cart->empty_cart();
+
+                    wp_redirect($this->get_return_url($order));
+                } else if (isset($_GET['paysto']) and $_GET['paysto'] == 'fail') {
+                    $orderId = $_POST['x_invoice_num'];
+                    $order = new WC_Order($orderId);
+                    $order->update_status('failed', __('Payment is not successful!', 'woocommerce'));
+
+                    wp_redirect($order->get_cancel_order_url());
+                    exit;
                 }
             }
         }

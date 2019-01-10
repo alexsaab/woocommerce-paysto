@@ -1,11 +1,11 @@
 <?php
 /*
 Plugin Name: Paysto Payment Gateway
-Plugin URI: https://www.agaxx.com
+Plugin URI: https://github.com/alexsaab/woocommerce-paysto
 Description: Allows you to use Paysto payment gateway with the WooCommerce plugin.
 Version: 1.3
 Author: Alex Agafonov
-Author URI: https://www.agaxx.com
+Author URI: https://github.com/alexsaab/
  */
 
 if (!defined('ABSPATH')) {
@@ -89,6 +89,10 @@ function woocommerce_paysto()
             $this->paysto_ips_servers = $this->get_option('paysto_ips_servers');
             $this->PaystoServers = preg_split('/\r\n|[\r\n]/', $this->paysto_ips_servers);
             $this->paysto_only_from_ips = $this->get_option('paysto_only_from_ips');
+
+            //  vat settings
+            $this->paysto_vat_products = $this->get_option('paysto_vat_products');
+            $this->paysto_vat_delivery = $this->get_option('paysto_vat_delivery');
 
             $this->debug = $this->get_option('debug');
             $this->description = $this->get_option('description');
@@ -214,6 +218,28 @@ function woocommerce_paysto()
                     'description' => __('Setup order status after successfull payment', 'woocommerce'),
                 ),
 
+                'paysto_vat_products' => array(
+                    'title' => __('VAT for products', 'woocommerce'),
+                    'type' => 'select',
+                    'options' => array(
+                        1 => __('With VAT', 'woocommerce'),
+                        0 => __('Without VAT', 'woocommerce')
+                    ),
+                    'description' => __('Set VAT for products in checkout', 'woocommerce'),
+                    'default' => '0',
+                ),
+
+                'paysto_vat_delivery' => array(
+                    'title' => __('VAT for delivery', 'woocommerce'),
+                    'type' => 'select',
+                    'options' => array(
+                        1 => __('With VAT', 'woocommerce'),
+                        0 => __('Without VAT', 'woocommerce')
+                    ),
+                    'description' => __('Set VAT for delivery in checkout', 'woocommerce'),
+                    'default' => '0',
+                ),
+
                 'paysto_ips_servers' => array(
                     'title' => __('IPs Addresses of Paysto callback servers', 'woocommerce'),
                     'type' => 'textarea',
@@ -297,6 +323,41 @@ function woocommerce_paysto()
                 'x_relay_response' => "TRUE",
                 'x_relay_url' => $x_relay_url,
             );
+
+            //add products
+            $pos = 1;
+            $x_line_item = '';
+            foreach ($order->get_items() as $product) {
+                $lineArr = array();
+
+                $lineArr[] = 'item'.$pos;
+                $lineArr[] = substr($product['name'], 0, 30);
+                $lineArr[] = substr($product['name'], 0, 254);
+                $lineArr[] = substr($product['quantity'], 0, 254);
+                $lineArr[] = number_format($product['total'] / $product['quantity'], 2, '.',
+                    '');
+                $lineArr[] = $this->paysto_vat_products;
+                $x_line_item .= 'x_line_item='.implode('<|>', $lineArr).'&';
+                $pos++;
+            }
+
+            // add delivery
+            $deliveryPrice = number_format($order->get_shipping_total(), 2, '.', '');
+            if ($deliveryPrice > 0.00) {
+                $lineArr = array();
+
+                $lineArr[] = 'item'.$pos;
+                $lineArr[] = __('Delivery of order #', 'woocommerce'). $order_id;
+                $lineArr[] = __('Delivery of order #', 'woocommerce'). $order_id;
+                $lineArr[] = 1;
+                $lineArr[] = number_format($order->get_shipping_total(), 2, '.', '');
+                $lineArr[] = $this->paysto_vat_delivery;
+
+                $x_line_item .= 'x_line_item='.implode('<|>', $lineArr).'&';
+                $pos++;
+            }
+
+            $args['x_line_item'] = $x_line_item;
 
             $args_array = array();
 

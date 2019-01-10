@@ -27,3 +27,4 @@
 !wp-content/plugins/paysto-for-woocommerce/
 !/wp-content/plugins/paysto-for-woocommerce/
 .idea
+dump.sql

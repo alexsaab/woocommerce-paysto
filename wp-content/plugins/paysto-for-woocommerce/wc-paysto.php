@@ -523,6 +523,7 @@ function woocommerce_paysto()
 
     }
 
+
     /**
      * Add the gateway to WooCommerce
      **/

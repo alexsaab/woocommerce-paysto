@@ -478,8 +478,6 @@ function woocommerce_paysto()
                     }
 
                     do_action('valid-paysto-standard-request', $_POST);
-                    $this->logger($_SERVER, '_SERVER');
-
                     $orderId = $_POST['x_invoice_num'];
                     $order = new WC_Order($orderId);
                     $order->update_status($this->paysto_order_status, __('Payment is successful!', 'woocommerce'));

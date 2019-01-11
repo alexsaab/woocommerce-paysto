@@ -458,7 +458,6 @@ function woocommerce_paysto()
         {
             global $woocommerce;
 
-
             if (isset($_GET['paysto']) && $_GET['paysto'] == 'result') {
                 if ($this->paysto_only_from_ips == 'yes' && ((!in_array($_SERVER['REMOTE_ADDR'], $this->PaystoServers)) || (!in_array($_SERVER['HTTP_CF_CONNECTING_IP'], $this->PaystoServers)))) {
                     wp_die('Request Failure');

@@ -63,7 +63,7 @@ function woocommerce_paysto()
      */
     class WC_PAYSTO extends WC_Payment_Gateway
     {
-        /** In this var store servers ip lists for Paysto system @var array  */
+        /** In this var store servers ip lists for Paysto system @var array */
         public $PaystoServers = [];
 
         public function __construct()
@@ -310,7 +310,7 @@ function woocommerce_paysto()
             $action_adr = $this->liveurl; // Url
             $orderAmount = $this->getOrderTotal($order); // Get order amount in 123.21
             $now = time();
-            
+
             $x_relay_url = get_site_url() . '/' . '?wc-api=wc_paysto&paysto=result';
 
             $args = array(
@@ -334,14 +334,14 @@ function woocommerce_paysto()
             foreach ($order->get_items() as $product) {
                 $lineArr = array();
 
-                $lineArr[] = 'item'.$pos;
+                $lineArr[] = '№' . $pos . "  ";
                 $lineArr[] = substr($product['name'], 0, 30);
                 $lineArr[] = substr($product['name'], 0, 254);
                 $lineArr[] = substr($product['quantity'], 0, 254);
                 $lineArr[] = number_format($product['total'] / $product['quantity'], 2, '.',
                     '');
                 $lineArr[] = $this->paysto_vat_products;
-                $x_line_item .= 'x_line_item='.implode('<|>', $lineArr).'&';
+                $x_line_item .= implode('<|>', $lineArr) . "0<|>\n";
                 $pos++;
             }
 
@@ -350,14 +350,14 @@ function woocommerce_paysto()
             if ($deliveryPrice > 0.00) {
                 $lineArr = array();
 
-                $lineArr[] = 'item'.$pos;
-                $lineArr[] = __('Delivery of order #', 'woocommerce'). $order_id;
-                $lineArr[] = __('Delivery of order #', 'woocommerce'). $order_id;
+                $lineArr[] = '№' . $pos . "  ";
+                $lineArr[] = __('Delivery of order #', 'woocommerce') . $order_id;
+                $lineArr[] = __('Delivery of order #', 'woocommerce') . $order_id;
                 $lineArr[] = 1;
                 $lineArr[] = number_format($order->get_shipping_total(), 2, '.', '');
                 $lineArr[] = $this->paysto_vat_delivery;
 
-                $x_line_item .= 'x_line_item='.implode('<|>', $lineArr).'&';
+                $x_line_item .= implode('<|>', $lineArr) . "0<|>\n";
                 $pos++;
             }
 
@@ -387,7 +387,8 @@ function woocommerce_paysto()
          * @param $x_currency_code
          * @return false|string
          */
-        private function get_x_fp_hash($x_login, $x_fp_sequence, $x_fp_timestamp, $x_amount, $x_currency_code){
+        private function get_x_fp_hash($x_login, $x_fp_sequence, $x_fp_timestamp, $x_amount, $x_currency_code)
+        {
             $arr = array($x_login, $x_fp_sequence, $x_fp_timestamp, $x_amount, $x_currency_code);
             $str = implode('^', $arr);
             return hash_hmac('md5', $str, $this->paysto_secret);
@@ -402,8 +403,9 @@ function woocommerce_paysto()
          * @param $x_amount
          * @return string
          */
-        private function get_x_MD5_Hash($x_login, $x_trans_id, $x_amount) {
-            return md5($this->paysto_secret.$x_login.$x_trans_id.$x_amount);
+        private function get_x_MD5_Hash($x_login, $x_trans_id, $x_amount)
+        {
+            return md5($this->paysto_secret . $x_login . $x_trans_id . $x_amount);
         }
 
 
@@ -456,48 +458,48 @@ function woocommerce_paysto()
         {
             global $woocommerce;
 
-            // Initially check if server make request not from approve IPs addresses
-            if ($this->paysto_only_from_ips && !in_array($_SERVER['REMOTE_ADDR'], $this->PaystoServers)) {
-                wp_die('Request Failure');
-            } else {
-                if (isset($_GET['paysto']) and $_GET['paysto'] == 'result') {
-                    @ob_clean();
 
-                    $_POST = stripslashes_deep($_POST);
-
-                    $x_response_code = $_POST['x_response_code'];
-                    $x_trans_id = $_POST['x_trans_id'];
-                    $x_invoice_num = $_POST['x_invoice_num'];
-                    $x_MD5_Hash = $_POST['x_MD5_Hash'];
-                    $x_amount = $_POST['x_amount'];
-
-                    $order = new WC_Order($x_invoice_num);
-
-                    if (($this->get_x_MD5_Hash($this->paysto_x_login, $x_trans_id, $this->getOrderTotal($order)) === $x_MD5_Hash) && ($x_response_code == 1) && $x_amount == $this->getOrderTotal($order)) {
-
-                        // Add transaction information for Paysto
-                        if ($this->debug) {
-                            $this->add_transaction_info($_POST);
-                        }
-
-                        do_action('valid-paysto-standard-request', $_POST);
-                    } else {
-                        wp_die('Request Failure');
-                    }
-                } else if (isset($_GET['paysto']) and $_GET['paysto'] == 'success') {
-                    $orderId = $_POST['x_invoice_num'];
-                    $order = new WC_Order($orderId);
-                    WC()->cart->empty_cart();
-
-                    wp_redirect($this->get_return_url($order));
-                } else if (isset($_GET['paysto']) and $_GET['paysto'] == 'fail') {
-                    $orderId = $_POST['x_invoice_num'];
-                    $order = new WC_Order($orderId);
-                    $order->update_status('failed', __('Payment is not successful!', 'woocommerce'));
-
-                    wp_redirect($order->get_cancel_order_url());
-                    exit;
+            if (isset($_GET['paysto']) && $_GET['paysto'] == 'result') {
+                if ($this->paysto_only_from_ips == 'yes' && ((!in_array($_SERVER['REMOTE_ADDR'], $this->PaystoServers)) || (!in_array($_SERVER['HTTP_CF_CONNECTING_IP'], $this->PaystoServers)))) {
+                    wp_die('Request Failure');
                 }
+                @ob_clean();
+                $_POST = stripslashes_deep($_POST);
+                $x_response_code = $_POST['x_response_code'];
+                $x_trans_id = $_POST['x_trans_id'];
+                $x_invoice_num = $_POST['x_invoice_num'];
+                $x_MD5_Hash = $_POST['x_MD5_Hash'];
+                $x_amount = $_POST['x_amount'];
+                $order = new WC_Order($x_invoice_num);
+                if (($this->get_x_MD5_Hash($this->paysto_x_login, $x_trans_id, $this->getOrderTotal($order)) === $x_MD5_Hash) && ($x_response_code == 1) && $x_amount == $this->getOrderTotal($order)) {
+
+                    // Add transaction information for Paysto
+                    if ($this->debug) {
+                        $this->add_transaction_info($_POST);
+                    }
+
+                    do_action('valid-paysto-standard-request', $_POST);
+                    $this->logger($_SERVER, '_SERVER');
+
+                    $orderId = $_POST['x_invoice_num'];
+                    $order = new WC_Order($orderId);
+                    $order->update_status($this->paysto_order_status, __('Payment is successful!', 'woocommerce'));
+                } else {
+                    wp_die('Request Failure');
+                }
+            } else if (isset($_GET['paysto']) and $_GET['paysto'] == 'success') {
+                $orderId = $_POST['x_invoice_num'];
+                $order = new WC_Order($orderId);
+                WC()->cart->empty_cart();
+
+                wp_redirect($this->get_return_url($order));
+            } else if (isset($_GET['paysto']) and $_GET['paysto'] == 'fail') {
+                $orderId = $_POST['x_invoice_num'];
+                $order = new WC_Order($orderId);
+                $order->update_status('failed', __('Payment is not successful!', 'woocommerce'));
+
+                wp_redirect($order->get_cancel_order_url());
+                exit;
             }
         }
 
@@ -512,7 +514,7 @@ function woocommerce_paysto()
             global $woocommerce;
             $orderId = $post['x_invoice_num'];
             $order = new WC_Order($orderId);
-            $message = __('Server Paysto payment system return data in post: ', 'woocommerce').print_r($post, true);
+            $message = __('Server Paysto payment system return data in post: ', 'woocommerce') . print_r($post, true);
             $order->add_order_note($message);
             return;
         }
@@ -550,6 +552,7 @@ function woocommerce_paysto()
 
         return $methods;
     }
+
     add_filter('woocommerce_payment_gateways', 'add_paysto_gateway');
 }
 

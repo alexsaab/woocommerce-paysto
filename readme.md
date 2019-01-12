@@ -50,18 +50,18 @@ In Wordpress in plugin set page you must set:
 
 В торговой платёжной системе PaySto сделать:
 <ul style = "list-style: none;">
-<li> Получить ID продавца </ li>
-<li> Получить секрет </ li>
-<li> Установить успешный URL: http://your_domain/?wc-api = wc_paysto & paysto = success </ li>
-<li> Установите URL-адрес ошибки: http://your_domain/?wc-api = wc_paysto & paysto = fail </ li>
-</ UL>
+<li> Получить ID продавца </li>
+<li> Получить секретное слово </li>
+<li> Установить успешный URL: http://your_domain/?wc-api= wc_paysto&paysto=success</li>
+<li> Установите URL-адрес ошибки: http://your_domain/?wc-api=wc_paysto&paysto=fail</li>
+</ul>
 
 В Wordpress на странице набора плагинов вы должны установить:
 <ul style = "list-style: none;">
-<li> Идентификатор продавца </ li>
-<li> Секретное слово </ li>
-<li> ставка НДС на товары </ li>
-<li> ставка НДС для доставки </ li>
-<li> Установите все другие необходимые поля </ li>
-</ UL>
+<li> Идентификатор продавца </li>
+<li> Секретное слово </li>
+<li> ставка НДС на товары </li>
+<li> ставка НДС для доставки </li>
+<li> Установите все другие необходимые поля </li>
+</ul>
 

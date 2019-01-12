@@ -74,7 +74,7 @@ function woocommerce_paysto()
             global $woocommerce;
 
             $this->id = 'paysto';
-            $this->icon = apply_filters('woocommerce_paysto_icon', '' . $plugin_dir . 'paysto.svg');
+            $this->icon = apply_filters('woocommerce_paysto_icon', '' . $plugin_dir . 'paysto.png');
             $this->has_fields = false;
             $this->liveurl = 'https://paysto.com/ru/pay/AuthorizeNet';
 
@@ -459,15 +459,19 @@ function woocommerce_paysto()
             global $woocommerce;
 
             if (isset($_GET['paysto']) && $_GET['paysto'] == 'result') {
+
                 $orderId = $_POST['x_invoice_num'];
                 $order = new WC_Order($orderId);
-                if ($this->paysto_order_status == $order->get_status()) {
+
+                if ($this->paysto_order_status == 'wc-'.$order->get_status()  && !$_POST['x_response_reason_code']) {
                     WC()->cart->empty_cart();
                     wp_redirect($this->get_return_url($order));
                 }
+
                 if ($this->paysto_only_from_ips == 'yes' && ((!in_array($_SERVER['REMOTE_ADDR'], $this->PaystoServers)) || (!in_array($_SERVER['HTTP_CF_CONNECTING_IP'], $this->PaystoServers)))) {
                     wp_die('Request Failure');
                 }
+
                 @ob_clean();
                 $_POST = stripslashes_deep($_POST);
                 $x_response_code = $_POST['x_response_code'];
@@ -478,8 +482,10 @@ function woocommerce_paysto()
                 $order = new WC_Order($x_invoice_num);
                 if (($this->get_x_MD5_Hash($this->paysto_x_login, $x_trans_id, $this->getOrderTotal($order)) === $x_MD5_Hash) && ($x_response_code == 1) && $x_amount == $this->getOrderTotal($order)) {
                     // Add transaction information for Paysto
-                    if ($this->debug) {
+                    if ($this->debug == 'yes' || $this->debug == '1') {
                         $this->add_transaction_info($_POST);
+                    } else {
+                        $this->add_transaction_info(__('Payment was successful with Paysto payment system, number of trunsaction is: ', 'woocommerce').$_POST['x_trans_id']);
                     }
                     do_action('valid-paysto-standard-request', $_POST);
                     $order->update_status($this->paysto_order_status, __('Payment is successful!', 'woocommerce'));

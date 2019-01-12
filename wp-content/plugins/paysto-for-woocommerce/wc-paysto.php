@@ -459,6 +459,11 @@ function woocommerce_paysto()
             global $woocommerce;
 
             if (isset($_GET['paysto']) && $_GET['paysto'] == 'result') {
+                $orderId = $_POST['x_invoice_num'];
+                $order = new WC_Order($orderId);
+                if ($this->paysto_order_status == $order->get_status()) {
+                    wp_redirect($order->get_view_order_url());
+                }
                 if ($this->paysto_only_from_ips == 'yes' && ((!in_array($_SERVER['REMOTE_ADDR'], $this->PaystoServers)) || (!in_array($_SERVER['HTTP_CF_CONNECTING_IP'], $this->PaystoServers)))) {
                     wp_die('Request Failure');
                 }
@@ -471,15 +476,11 @@ function woocommerce_paysto()
                 $x_amount = $_POST['x_amount'];
                 $order = new WC_Order($x_invoice_num);
                 if (($this->get_x_MD5_Hash($this->paysto_x_login, $x_trans_id, $this->getOrderTotal($order)) === $x_MD5_Hash) && ($x_response_code == 1) && $x_amount == $this->getOrderTotal($order)) {
-
                     // Add transaction information for Paysto
                     if ($this->debug) {
                         $this->add_transaction_info($_POST);
                     }
-
                     do_action('valid-paysto-standard-request', $_POST);
-                    $orderId = $_POST['x_invoice_num'];
-                    $order = new WC_Order($orderId);
                     $order->update_status($this->paysto_order_status, __('Payment is successful!', 'woocommerce'));
                 } else {
                     wp_die('Request Failure');
@@ -488,13 +489,11 @@ function woocommerce_paysto()
                 $orderId = $_POST['x_invoice_num'];
                 $order = new WC_Order($orderId);
                 WC()->cart->empty_cart();
-
                 wp_redirect($this->get_return_url($order));
             } else if (isset($_GET['paysto']) and $_GET['paysto'] == 'fail') {
                 $orderId = $_POST['x_invoice_num'];
                 $order = new WC_Order($orderId);
                 $order->update_status('failed', __('Payment is not successful!', 'woocommerce'));
-
                 wp_redirect($order->get_cancel_order_url());
                 exit;
             }

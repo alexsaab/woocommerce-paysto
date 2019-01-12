@@ -23,11 +23,21 @@ If you have any questions please contact dev@agaxx.ru
 
 In merchant payment system PaySto make:
 <ul style="list-style:none;">
-<li>Get mercant</li>
+<li>Get merchant ID</li>
 <li>Get secret</li>
 <li>Set success URL: http://your_domain/?wc-api=wc_paysto&paysto=success</li>
 <li>Set fail URL: http://your_domain/?wc-api=wc_paysto&paysto=fail</li>
 </ul>
+
+In Wordpress in plugin set page you must set:
+<ul style="list-style:none;">
+<li>Merchant ID</li>
+<li>Secret word</li>
+<li>VAT rate for products</li>
+<li>VAT rate for delivery</li>
+<li>Set all other nessessary fields</li>
+</ul>
+
 
 == Changelog ==
 = 1.00 =

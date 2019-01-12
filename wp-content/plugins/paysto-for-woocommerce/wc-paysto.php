@@ -462,7 +462,8 @@ function woocommerce_paysto()
                 $orderId = $_POST['x_invoice_num'];
                 $order = new WC_Order($orderId);
                 if ($this->paysto_order_status == $order->get_status()) {
-                    wp_redirect($order->get_view_order_url());
+                    WC()->cart->empty_cart();
+                    wp_redirect($this->get_return_url($order));
                 }
                 if ($this->paysto_only_from_ips == 'yes' && ((!in_array($_SERVER['REMOTE_ADDR'], $this->PaystoServers)) || (!in_array($_SERVER['HTTP_CF_CONNECTING_IP'], $this->PaystoServers)))) {
                     wp_die('Request Failure');

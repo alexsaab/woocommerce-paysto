@@ -162,7 +162,8 @@ function woocommerce_paysto()
 
         <?php else: ?>
             <div class="inline error"><p>
-                    <strong><?php _e('Gate swich off', 'woocommerce'); ?></strong>: <?php _e('PAYSTO not support currency used in your store.', 'woocommerce'); ?>
+                    <strong><?php _e('Gate swich off', 'woocommerce'); ?></strong>:
+                    <?php _e('PAYSTO not support currency used in your store.', 'woocommerce'); ?>
                 </p></div>
         <?php
         endif;
@@ -205,14 +206,16 @@ function woocommerce_paysto()
                     'title' => __('Code of your store', 'woocommerce'),
                     'type' => 'text',
                     'required' => true,
-                    'description' => __('Please find your merchant id in merchant in Paysto merchant backoffice', 'woocommerce'),
+                    'description' => __('Please find your merchant id in merchant in Paysto merchant backoffice',
+                        'woocommerce'),
                     'default' => '',
                 ),
 
                 'paysto_secret' => array(
                     'title' => __('Secret', 'woocommerce'),
                     'type' => 'password',
-                    'description' => __('Paysto secret word, please set it also in Paysto merchant backoffice', 'woocommerce'),
+                    'description' => __('Paysto secret word, please set it also in Paysto merchant backoffice',
+                        'woocommerce'),
                     'default' => '',
                 ),
 
@@ -248,7 +251,8 @@ function woocommerce_paysto()
                 'paysto_ips_servers' => array(
                     'title' => __('IPs Addresses of Paysto callback servers', 'woocommerce'),
                     'type' => 'textarea',
-                    'description' => __('This options need for security reason. Each server IP must begin in new line.', 'woocommerce'),
+                    'description' => __('This options need for security reason. Each server IP must begin in new line.',
+                        'woocommerce'),
                     'default' => '95.213.209.218
 95.213.209.219
 95.213.209.220
@@ -266,22 +270,26 @@ function woocommerce_paysto()
                 'debug' => array(
                     'title' => __('Debug', 'woocommerce'),
                     'type' => 'checkbox',
-                    'label' => __('Switch on logging in file (<code>woocommerce/logs/paysto.txt</code>)', 'woocommerce'),
+                    'label' => __('Switch on logging in file (<code>woocommerce/logs/paysto.txt</code>)',
+                        'woocommerce'),
                     'default' => 'no',
                 ),
 
                 'description' => array(
                     'title' => __('Description', 'woocommerce'),
                     'type' => 'textarea',
-                    'description' => __('Description of payment method which user can see in you site.', 'woocommerce'),
+                    'description' => __('Description of payment method which user can see in you site.',
+                        'woocommerce'),
                     'default' => __('Payment with Paysto service.', 'woocommerce'),
                 ),
 
                 'instructions' => array(
                     'title' => __('Instructions', 'woocommerce'),
                     'type' => 'textarea',
-                    'description' => __('Instructions which can added in page of thank-you-payment page.', 'woocommerce'),
-                    'default' => __('Payment with Paysto service. Thank you very much for you payment.', 'woocommerce'),
+                    'description' => __('Instructions which can added in page of thank-you-payment page.',
+                        'woocommerce'),
+                    'default' => __('Payment with Paysto service. Thank you very much for you payment.',
+                        'woocommerce'),
                 ),
             );
         }
@@ -300,7 +308,7 @@ function woocommerce_paysto()
 
         /**
          * Generate the dibs button link
-         **/
+         */
         public function generate_form($order_id)
         {
             global $woocommerce;
@@ -366,13 +374,17 @@ function woocommerce_paysto()
             $args_array = array();
 
             foreach ($args as $key => $value) {
-                $args_array[] = '<input type="hidden" name="' . esc_attr($key) . '" value="' . esc_attr($value) . '" />';
+                $args_array[] = '<input type="hidden" name="' . esc_attr($key) . '" value="' . esc_attr($value) .
+                    '" />';
             }
 
             return
                 '<form action="' . esc_url($action_adr) . '" method="POST" id="paysto_payment_form">' . "\n" .
                 implode("\n", $args_array) .
-                '<input type="submit" class="button alt" id="submit_paysto_payment_form" value="' . __('Pay now', 'woocommerce') . '" /> <a class="button cancel" href="' . $order->get_cancel_order_url() . '">' . __('Refuse payment and return to buyer cart.', 'woocommerce') . '</a>' . "\n" .
+                '<input type="submit" class="button alt" id="submit_paysto_payment_form" value="' .
+                __('Pay now', 'woocommerce') . '" /> <a class="button cancel" href="' .
+                $order->get_cancel_order_url() . '">' .
+                __('Refuse payment and return to buyer cart.', 'woocommerce') . '</a>' . "\n" .
                 '</form>';
         }
 
@@ -468,7 +480,9 @@ function woocommerce_paysto()
                     $_SESSION['paysto_pay'] = "success";
                     wp_redirect($this->get_return_url($order));
                 }
-                if ($this->paysto_only_from_ips == 'yes' && ((!in_array($_SERVER['HTTP_X_FORWARDED_FOR'], $this->PaystoServers)) || (!in_array($_SERVER['HTTP_CF_CONNECTING_IP'], $this->PaystoServers)))) {
+                if ($this->paysto_only_from_ips == 'yes' &&
+                    ((!in_array($_SERVER['HTTP_X_FORWARDED_FOR'], $this->PaystoServers)) ||
+                        (!in_array($_SERVER['HTTP_CF_CONNECTING_IP'], $this->PaystoServers)))) {
                     if (!isset($_SESSION['paysto_pay'])) {
                         if ($_SESSION['paysto_pay'] != 'success') {
                             wp_die('Request Failure');
@@ -485,24 +499,27 @@ function woocommerce_paysto()
                 $x_MD5_Hash = $_POST['x_MD5_Hash'];
                 $x_amount = $_POST['x_amount'];
                 $order = new WC_Order($x_invoice_num);
-                if (($this->get_x_MD5_Hash($this->paysto_x_login, $x_trans_id, $this->getOrderTotal($order)) === $x_MD5_Hash) && ($x_response_code == 1) && $x_amount == $this->getOrderTotal($order)) {
+                if (($this->get_x_MD5_Hash($this->paysto_x_login, $x_trans_id, $this->getOrderTotal($order)) === $x_MD5_Hash) &&
+                    ($x_response_code == 1) &&
+                    $x_amount == $this->getOrderTotal($order)) {
                     // Add transaction information for Paysto
                     if ($this->debug == 'yes' || $this->debug == '1') {
                         $this->add_transaction_info($_POST);
                     } else {
-                        $this->add_transaction_info(__('Payment was successful with Paysto payment system, number of trunsaction is: ', 'woocommerce') . $_POST['x_trans_id']);
+                        $this->add_transaction_info(__('Payment was successful with Paysto payment system, number of trunsaction is: ',
+                                'woocommerce') . $_POST['x_trans_id']);
                     }
                     do_action('valid-paysto-standard-request', $_POST);
                     $order->update_status($this->paysto_order_status, __('Payment is successful!', 'woocommerce'));
                 } else {
                     wp_die('Request Failure');
                 }
-            } else if (isset($_GET['paysto']) and $_GET['paysto'] == 'success') {
+            } elseif (isset($_GET['paysto']) and $_GET['paysto'] == 'success') {
                 $orderId = $_POST['x_invoice_num'];
                 $order = new WC_Order($orderId);
                 WC()->cart->empty_cart();
                 wp_redirect($this->get_return_url($order));
-            } else if (isset($_GET['paysto']) and $_GET['paysto'] == 'fail') {
+            } elseif (isset($_GET['paysto']) and $_GET['paysto'] == 'fail') {
                 $orderId = $_POST['x_invoice_num'];
                 $order = new WC_Order($orderId);
                 $order->update_status('failed', __('Payment is not successful!', 'woocommerce'));
@@ -522,7 +539,8 @@ function woocommerce_paysto()
             global $woocommerce;
             $orderId = $post['x_invoice_num'];
             $order = new WC_Order($orderId);
-            $message = __('Server Paysto payment system return data in post: ', 'woocommerce') . print_r($post, true);
+            $message = __('Server Paysto payment system return data in post: ', 'woocommerce') .
+                print_r($post, true);
             $order->add_order_note($message);
             return;
         }

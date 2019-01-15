@@ -469,6 +469,7 @@ function woocommerce_paysto()
         function check_response()
         {
             global $woocommerce;
+
             if (isset($_GET['paysto']) && $_GET['paysto'] == 'result') {
                 $orderId = $_POST['x_invoice_num'];
                 $order = new WC_Order($orderId);
@@ -481,17 +482,26 @@ function woocommerce_paysto()
                     wp_redirect($this->get_return_url($order));
                 }
                 if ($this->paysto_only_from_ips == 'yes' &&
-                    ((!in_array($_SERVER['HTTP_X_FORWARDED_FOR'], $this->PaystoServers)) ||
-                        (!in_array($_SERVER['HTTP_CF_CONNECTING_IP'], $this->PaystoServers)))) {
+                    ((!in_array($_SERVER['HTTP_X_FORWARDED_FOR'], $this->PaystoServers)) &&
+                        (!in_array($_SERVER['HTTP_CF_CONNECTING_IP'], $this->PaystoServers)) &&
+                        (!in_array($_SERVER['HTTP_X_REAL_IP'], $this->PaystoServers)) &&
+                        (!in_array($_SERVER['REMOTE_ADDR'], $this->PaystoServers)) &&
+                        (!in_array($_SERVER['GEOIP_ADDR'], $this->PaystoServers)))) {
+
+                    $this->logger('JJJJ1');
                     if (!isset($_SESSION['paysto_pay'])) {
+                        $this->logger('JJJJ2');
                         if ($_SESSION['paysto_pay'] != 'success') {
+                            $this->logger('JJJJ3');
                             wp_die('Request Failure');
                         }
                     } else {
+                        $this->logger('JJJJ4');
                         session_destroy();
                     }
                 }
                 @ob_clean();
+                $this->logger('JJJJ5');
                 $_POST = stripslashes_deep($_POST);
                 $x_response_code = $_POST['x_response_code'];
                 $x_trans_id = $_POST['x_trans_id'];

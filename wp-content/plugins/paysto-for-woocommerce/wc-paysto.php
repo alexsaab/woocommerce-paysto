@@ -488,20 +488,15 @@ function woocommerce_paysto()
                         (!in_array($_SERVER['REMOTE_ADDR'], $this->PaystoServers)) &&
                         (!in_array($_SERVER['GEOIP_ADDR'], $this->PaystoServers)))) {
 
-                    $this->logger('JJJJ1');
                     if (!isset($_SESSION['paysto_pay'])) {
-                        $this->logger('JJJJ2');
                         if ($_SESSION['paysto_pay'] != 'success') {
-                            $this->logger('JJJJ3');
                             wp_die('Request Failure');
                         }
                     } else {
-                        $this->logger('JJJJ4');
                         session_destroy();
                     }
                 }
                 @ob_clean();
-                $this->logger('JJJJ5');
                 $_POST = stripslashes_deep($_POST);
                 $x_response_code = $_POST['x_response_code'];
                 $x_trans_id = $_POST['x_trans_id'];

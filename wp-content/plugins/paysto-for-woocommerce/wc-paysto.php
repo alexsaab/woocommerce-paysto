@@ -490,7 +490,7 @@ function woocommerce_paysto()
 
                     if (!isset($_SESSION['paysto_pay'])) {
                         if ($_SESSION['paysto_pay'] != 'success') {
-                            wp_die('Request Failure');
+                            wp_redirect($this->get_return_url($order));
                         }
                     } else {
                         session_destroy();
@@ -517,7 +517,7 @@ function woocommerce_paysto()
                     do_action('valid-paysto-standard-request', $_POST);
                     $order->update_status($this->paysto_order_status, __('Payment is successful!', 'woocommerce'));
                 } else {
-                    wp_die('Request Failure');
+                    wp_redirect($this->get_return_url($order));
                 }
             } elseif (isset($_GET['paysto']) and $_GET['paysto'] == 'success') {
                 $orderId = $_POST['x_invoice_num'];

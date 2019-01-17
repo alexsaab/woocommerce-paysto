@@ -326,6 +326,7 @@ function woocommerce_paysto()
                 'x_description' => $this->paysto_x_description,
                 'x_login' => $this->paysto_x_login,
                 'x_amount' => $orderAmount,
+                'x_email' => $order->get_billing_email(),
                 'x_currency_code' => $order->get_currency(),
                 'x_fp_sequence' => $order_id,
                 'x_fp_timestamp' => $now,

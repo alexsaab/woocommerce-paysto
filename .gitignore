@@ -24,7 +24,7 @@
 /wp-content/index.php
 /wp-content/plugins/index.php
 /wp-content/plugins/hello.php
-!wp-content/plugins/paysto-for-woocommerce/
-!/wp-content/plugins/paysto-for-woocommerce/
+!wp-content/plugins/wc-paysto-payment-gateway/
+!/wp-content/plugins/wc-paysto-payment-gateway/
 .idea
 dump.sql

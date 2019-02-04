@@ -1,12 +1,19 @@
 <?php
 /**
+ * @author      Your Name
+ * @copyright   2019 Alex Agafonov
+ * @license     GPL-2.0+
+ *
  * @wordpress-plugin
  * Plugin Name: WC Paysto Payment Gateway
- * Plugin URI: https://github.com/alexsaab/woocommerce-paysto
+ * Plugin URI:  https://github.com/alexsaab/woocommerce-paysto
  * Description: Allows you to use Paysto payment gateway with the WooCommerce plugin.
- * Version: 1.3
- * Author: Alex Agafonov
- * Author URI: https://github.com/alexsaab/
+ * Version:     1.0.0
+ * Author:      Alex Agafonov
+ * Author URI:  https://github.com/alexsaab/
+ * Text Domain: wc-paysto-payment-gateway
+ * License:     GPL-2.0+
+ * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
  */
 
 if (!defined('ABSPATH')) {

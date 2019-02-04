@@ -1,6 +1,6 @@
 <?php
 /**
- * @author      Your Name
+ * @author      Alex Agafonov
  * @copyright   2019 Alex Agafonov
  * @license     GPL-2.0+
  *
